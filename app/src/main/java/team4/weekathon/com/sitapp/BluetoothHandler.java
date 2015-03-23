@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 
 /**
@@ -44,6 +45,8 @@ public class BluetoothHandler
     public java.io.InputStream getInputStream() throws IOException {
         return btSocket.getInputStream();
     }
+
+    public OutputStream getOutputStream() throws IOException { return btSocket.getOutputStream();}
 
     public boolean CheckBluetoothConnection()
     {

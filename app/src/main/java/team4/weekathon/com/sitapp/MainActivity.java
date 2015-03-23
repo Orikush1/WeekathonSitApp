@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -30,7 +31,6 @@ import team4.weekathon.com.workoutchair.R;
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
     private InputStream inStream = null;
     private Handler handler = new Handler();
@@ -71,7 +71,8 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v)
                 {
-
+                    Intent intent = new Intent(MainActivity.this, WorkoutActivity.class);
+                    startActivity(intent);
                 }
             });
         }
@@ -178,7 +179,7 @@ public class MainActivity extends ActionBarActivity {
     {
         try
         {
-            outStream = btSocket.getOutputStream();
+            outStream = BluetoothHandler.getInstance().getOutputStream();
         } catch (IOException e)
         {
             Log.d(TAG, "Bug BEFORE Sending stuff", e);
