@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
@@ -23,6 +24,13 @@ public class BluetoothHandler
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static BluetoothHandler _instance = new BluetoothHandler();
     private Context mContext;
+    private boolean stopWorker;
+    private InputStream inStream;
+    private int readBufferPosition;
+    private byte[] readBuffer = new byte[1024];
+    private static final byte delimiter =  (byte) '\n';
+    private Thread workerThread;
+
 
     public BluetoothHandler()
     {
@@ -96,6 +104,88 @@ public class BluetoothHandler
             Log.d(TAG, "Socket creation failed");
             return false;
         }
+
+        beginListenForData();
         return true;
+    }
+
+    public void beginListenForData()
+    {
+        try
+        {
+            inStream = BluetoothHandler.getInstance().getInputStream();
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, "Error to get input stream from bt" + e);
+        }
+
+        workerThread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                Log.d(TAG, "Thread BT");
+                while(!Thread.currentThread().isInterrupted())
+                {
+                    if(!stopWorker)
+                    {
+                        try {
+                            int bytesAvailable = inStream.available();
+                            if (bytesAvailable > 0) {
+                                byte[] packetBytes = new byte[bytesAvailable];
+                                inStream.read(packetBytes);
+                                for (int i = 0; i < bytesAvailable; i++) {
+                                    byte b = packetBytes[i];
+                                    if (b == delimiter)
+                                    {
+                                        byte[] encodedBytes = new byte[readBufferPosition];
+                                        System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                        final String data = new String(encodedBytes, "US-ASCII");
+                                        readBufferPosition = 0;
+
+                                        Log.i("SENSOR_DATA", "OUR BT Result - " + data);
+                                        detectData(data);
+                                    }
+                                    else
+                                    {
+                                        readBuffer[readBufferPosition++] = b;
+                                    }
+                                }
+                            }
+
+                        } catch (IOException ex) {
+                            stopWorker = true;
+                        }
+                    }
+                }
+            }
+        });
+
+        workerThread.start();
+    }
+
+    public void detectData(String data)
+    {
+        String parsedData[] = data.split(":");
+        if(parsedData.length >= 2)
+        {
+            int sensorName = Integer.parseInt(parsedData[0]);
+            String value = parsedData[1].replace("\r", "");
+            if(value != null || !value.equals(""))
+            {
+                SensorsChair.SENSORS_CODE_LIST  code = SensorsChair.SENSORS_CODE_LIST.values()[sensorName];
+                switch(code)
+                {
+                    case UPPER_BACK_SENSOR_NAME:
+                    case LOWER_BACK_SENSOR_NAME:
+                    case FEET_SENSOR_NAME:
+                    case SITTING_BONE_SENSOR_NAME:
+                        SensorsChair.getInstance().updateSensor(code,  value);
+                        break;
+                    default:
+                        Log.i(TAG, "Couldn't detect data by sensor " + data);
+                }
+            }
+        }
     }
 }

@@ -1,9 +1,9 @@
 package team4.weekathon.com.sitapp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import rx.subjects.PublishSubject;
 
 /**
  * Created by Ori on 3/22/2015.
@@ -14,6 +14,7 @@ public class SensorsChair
     private int numberOfBadState;
     private Map<SENSORS_CODE_LIST, Sensor> sensorsList;
     private static SensorsChair _instance = new SensorsChair();
+    private PublishSubject<SENSORS_CODE_LIST> updateNotifier;
 
     public enum POSTURE_STATUS
     {
@@ -33,8 +34,6 @@ public class SensorsChair
 
     }
 
-
-
     public static SensorsChair getInstance()
     {
         if (_instance == null)
@@ -46,25 +45,33 @@ public class SensorsChair
 
     public SensorsChair()
     {
+        updateNotifier = PublishSubject.create();
         sensorsList =  new HashMap<SENSORS_CODE_LIST, Sensor>();
 
-        sensorsList.put(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME.name(),150 ));
-        sensorsList.put(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME.name(),120 ));
-        sensorsList.put(SENSORS_CODE_LIST.ARM, new Sensor(SENSORS_CODE_LIST.ARM.name(),100 ));
-        sensorsList.put(SENSORS_CODE_LIST.FEET_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.FEET_SENSOR_NAME.name(),60 ));
-        sensorsList.put(SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.FEET_SENSOR_NAME.name(), 98));
+        sensorsList.put(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME.name(),400 , 600));
+        sensorsList.put(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME.name(), 400, 600 ));
+        sensorsList.put(SENSORS_CODE_LIST.ARM, new Sensor(SENSORS_CODE_LIST.ARM.name(),400 , 600 ));
+        sensorsList.put(SENSORS_CODE_LIST.FEET_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.FEET_SENSOR_NAME.name(),400, 600 ));
+        sensorsList.put(SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.FEET_SENSOR_NAME.name(), 400, 600));
 
         mPostureStatus = POSTURE_STATUS.OK;
         numberOfBadState = 0;
     }
 
+    public rx.Observable<SENSORS_CODE_LIST> getUpdateNotifier()
+    {
+        return updateNotifier.asObservable();
+    }
+
     public void updateSensor(SENSORS_CODE_LIST sensorCode, String state)
     {
         Sensor currentSensor = sensorsList.get(sensorCode);
-        if(currentSensor != null) {
-            currentSensor.setState(state);
+        if(currentSensor != null)
+        {
 
-            if(currentSensor.isState())
+            boolean isChangedState = currentSensor.setState(state);
+
+            if(currentSensor.isSitting())
             {
                 if(numberOfBadState > 0)
                 {
@@ -81,9 +88,12 @@ public class SensorsChair
                 numberOfBadState++;
                 mPostureStatus = POSTURE_STATUS.BAD;
             }
+
+            if(isChangedState)
+            {
+                updateNotifier.onNext(sensorCode);
+            }
         }
-
-
     }
 
 

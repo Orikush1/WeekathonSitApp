@@ -5,15 +5,17 @@ package team4.weekathon.com.sitapp;
  */
 public class Sensor
 {
-    private final int threshold;
+    private final int thresholdMin;
+    private final int thresholdMax;
     private String sensorDesc;
     private boolean state;
 
-    public Sensor(String sensorDesc, int threshold)
+    public Sensor(String sensorDesc, int thresholdMin, int thresholdMax)
     {
         this.sensorDesc = sensorDesc;
         this.state = false;
-        this.threshold = threshold;
+        this.thresholdMin = thresholdMin;
+        this.thresholdMax = thresholdMax;
     }
 
     public String getSensorDesc() {
@@ -24,18 +26,32 @@ public class Sensor
         this.sensorDesc = sensorDesc;
     }
 
-    public boolean isState() {
+    public boolean isSitting() {
         return state;
     }
 
-    public void setState(String state) {
+    public boolean setState(String state)
+    {
+        boolean isChangedState = false;
+
         int value = Integer.parseInt(state);
-        if (value < threshold){
-            this.state = true;
+        if(this.state == true)
+        {
+            if(value < thresholdMin)
+            {
+                this.state = false;
+                isChangedState = true;
+            }
         }
         else
         {
-            this.state = false;
+            if(value > thresholdMax)
+            {
+                this.state = true;
+                isChangedState = true;
+            }
         }
+
+        return isChangedState;
     }
 }

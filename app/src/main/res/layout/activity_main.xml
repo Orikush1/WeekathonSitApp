@@ -11,13 +11,11 @@
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/traffic_light_green"
+        android:src="@drawable/traffic_light_red"
         android:id="@+id/traffic_light"
         android:layout_marginRight="19dp"
         android:layout_marginEnd="19dp"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/editText"
-        android:layout_toStartOf="@+id/editText" />
+        android:layout_alignParentTop="true" />
 
 
     <ImageView
@@ -30,7 +28,7 @@
     <View
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:background="@drawable/circle"
+        android:background="@drawable/circle_red"
         android:id="@+id/upper_back"
         android:layout_marginTop="124dp"
         android:layout_alignTop="@+id/posture"
@@ -42,7 +40,7 @@
     <View
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:background="@drawable/circle"
+        android:background="@drawable/circle_red"
         android:id="@+id/lower_back"
         android:layout_marginTop="17dp"
         android:layout_marginLeft="110dp"
@@ -51,7 +49,7 @@
     <View
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:background="@drawable/circle"
+        android:background="@drawable/circle_red"
         android:id="@+id/sitting_bone"
         android:layout_marginTop="45dp"
         android:layout_marginLeft="120dp"
@@ -60,7 +58,7 @@
     <View
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:background="@drawable/circle"
+        android:background="@drawable/circle_red"
         android:id="@+id/leg"
         android:layout_marginTop="46dp"
         android:layout_marginLeft="152dp"
@@ -69,7 +67,7 @@
     <View
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:background="@drawable/circle"
+        android:background="@drawable/circle_red"
         android:id="@+id/foot"
         android:layout_marginTop="118dp"
         android:layout_marginLeft="176dp"
@@ -78,7 +76,7 @@
     <View
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:background="@drawable/circle"
+        android:background="@drawable/circle_red"
         android:id="@+id/arm"
         android:layout_marginTop="12dp"
         android:layout_marginLeft="150dp"

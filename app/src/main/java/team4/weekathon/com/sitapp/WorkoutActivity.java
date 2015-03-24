@@ -10,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 /**
  * Created by Ori on 3/23/2015.
@@ -50,26 +49,7 @@ public class WorkoutActivity extends FragmentActivity
 
             }
         };
-
-        mViewPager.setOnPageChangeListener(
-                new ViewPager.SimpleOnPageChangeListener() {
-                    @Override
-                    public void onPageSelected(int position) {
-                        // When swiping between pages, select the
-                        // corresponding tab.
-                        getActionBar().setSelectedNavigationItem(position);
-                    }
-                });
-
-        // Add 3 tabs, specifying the tab's text and TabListener
-        for (int i = 0; i < 2; i++) {
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText("Exercise " + (i + 1))
-                            .setTabListener(tabListener));
-        }
     }
-
 
     public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
         public DemoCollectionPagerAdapter(FragmentManager fm) {
@@ -104,7 +84,7 @@ public class WorkoutActivity extends FragmentActivity
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "OBJECT " + (position + 1);
+            return "Exercise  " + (position + 1);
         }
     }
 
@@ -120,9 +100,6 @@ public class WorkoutActivity extends FragmentActivity
             // properly.
             View rootView = inflater.inflate(
                     R.layout.workout_tab, container, false);
-/*            Bundle args = getArguments();
-            ((TextView) rootView.findViewById(android.R.id.text1)).setText(
-                    Integer.toString(args.getInt(ARG_OBJECT)));*/
             return rootView;
         }
     }

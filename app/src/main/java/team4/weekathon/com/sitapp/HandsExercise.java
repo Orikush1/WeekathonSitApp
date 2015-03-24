@@ -4,6 +4,7 @@ package team4.weekathon.com.sitapp;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,10 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import rx.Subscriber;
+import rx.android.observables.AndroidObservable;
 
 /**
  * Created by Ori on 3/24/2015.
@@ -45,10 +50,10 @@ public class HandsExercise extends Fragment {
 
         ballImage = new ImageView(getActivity());
         //setting image resource
-        ballImage.setImageResource(R.drawable.a);
+        ballImage.setImageResource(R.drawable.crab);
         //ballImage.setId(R.id.ball);
         ViewGroup.LayoutParams imageViewLayoutParams
-                = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                = new RelativeLayout.LayoutParams(90,90);
 
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
                 (RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -66,9 +71,49 @@ public class HandsExercise extends Fragment {
         initGame1();
         doGame1();
 
+        rx.Observable<SensorsChair.SENSORS_CODE_LIST> updateSensorUI = SensorsChair.getInstance().getUpdateNotifier();
+        updateSensorUI =  AndroidObservable.bindFragment(this, updateSensorUI);
+        updateSensorUI.subscribe(new Subscriber<SensorsChair.SENSORS_CODE_LIST>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(SensorsChair.SENSORS_CODE_LIST sensorCode)
+            {
+                updateSensorUI(sensorCode);
+            }
+        });
         return rootView;
     }
 
+    private void updateSensorUI(SensorsChair.SENSORS_CODE_LIST sensorCode)
+    {
+        Sensor currentSensor = SensorsChair.getInstance().getSensor(sensorCode);
+        switch(sensorCode)
+        {
+            case SITTING_BONE_SENSOR_NAME:
+            case ARM:
+            case FEET_SENSOR_NAME:
+            case  LOWER_BACK_SENSOR_NAME:
+            case UPPER_BACK_SENSOR_NAME:
+                if(currentSensor.isSitting() && avatarIsUp)
+                {
+                    MoveAvatarDown();
+                }
+                else if(!currentSensor.isSitting() && !avatarIsUp)
+                {
+                    MoveAvatarUp();
+                }
+                break;
+        }
+    }
 
 
     private void MoveAvatarUp() {
@@ -90,10 +135,13 @@ public class HandsExercise extends Fragment {
             imageView.startAnimation(moveDown);
         }
 
-        if(game1state==4 && situpIsGood) {
+        if(game1state==4 && situpIsGood)
+        {
             situpIsGood = false;
             imageView.setImageResource(R.drawable.androidr);
-        } else {
+        }
+        else
+        {
             imageView.setImageResource(R.drawable.android);
         }
         avatarIsUp = false;
@@ -114,35 +162,36 @@ public class HandsExercise extends Fragment {
                 //Toast.makeText(getApplicationContext(), "Down", Toast.LENGTH_SHORT).show();
                 MoveAvatarDown();
             }
-            //
-            //TranslateAnimation moveLefttoRight = new TranslateAnimation(0, 200, 0, 0);
-            //moveLefttoRight.setDuration(5000);
-            //moveLefttoRight.setFillAfter(true);
-            //v.setAnimation(moveLefttoRight);
         }
     };
 
     private void initGame1() {
         //currentBallNum = numBalls;
         game1state=0;
-        //MoveAvatarDown();
-        //avatarIsUp = false;
-        //imageView.setImageResource(R.drawable.android);
-        //game1score = 0;
         scoreText.setText("SitUpsLeft=" + currentBallNum);
     }
 
     private void doGame1() {
 
+        final long duration1 = 50000/speedLevel;
         if (game1state==0 && currentBallNum>=0) {
             game1state = 1;
             TranslateAnimation moveLeft1 = new TranslateAnimation(0, -400, 0, 0);
-            moveLeft1.setDuration(50000/speedLevel);
+            moveLeft1.setDuration(duration1);
             moveLeft1.setFillAfter(true);
 
             moveLeft1.setAnimationListener(new Animation.AnimationListener() {
                 public void onAnimationStart(Animation a) {
                     //Log.v("anim","---- animation start listener called"  );
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                           Toast goUpToast =  Toast.makeText(getActivity(), "Be careful !", Toast.LENGTH_SHORT);
+                            goUpToast.setGravity(Gravity.BOTTOM, 200, 200);
+                            goUpToast.show();
+                        }
+                    }, (long)(duration1 * 0.8));
                 }
 
                 public void onAnimationRepeat(Animation a) {
