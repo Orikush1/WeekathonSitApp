@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import team4.weekathon.com.workoutchair.R;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -38,7 +37,7 @@ public class MainActivity extends ActionBarActivity {
     private boolean stopWorker = false;
     private int readBufferPosition = 0;
     private byte[] readBuffer = new byte[1024];
-
+    private int badPostureNotificationNumber;
 
     private TextView blueToothMessage;
 
@@ -48,6 +47,7 @@ public class MainActivity extends ActionBarActivity {
     private View mArm;
     private ImageView mGeneralPostureState;
     private Button mWorkoutExercise;
+    private Thread workerThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,29 +67,39 @@ public class MainActivity extends ActionBarActivity {
         if(isConnected)
         {
             beginListenForData();
-            mWorkoutExercise.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    Intent intent = new Intent(MainActivity.this, WorkoutActivity.class);
-                    startActivity(intent);
-                }
-            });
         }
+
+        mWorkoutExercise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(MainActivity.this, WorkoutActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        writeData("a");
+
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause()
+    {
+        super.onRestart();
         stopWorker = true;
-
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
         stopWorker = false;
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        workerThread.interrupt();
     }
 
     @Override
@@ -126,47 +136,42 @@ public class MainActivity extends ActionBarActivity {
             Log.e(TAG, "Error to get input stream from bt" + e);
         }
 
-        Thread workerThread = new Thread(new Runnable()
+        workerThread = new Thread(new Runnable()
         {
             public void run()
             {
-                while(!Thread.currentThread().isInterrupted() && !stopWorker)
+                Log.d(TAG, "Thread BT");
+                while(!Thread.currentThread().isInterrupted())
                 {
-                    try
+                    if(!stopWorker)
                     {
-                        int bytesAvailable = inStream.available();
-                        if(bytesAvailable > 0)
-                        {
-                            byte[] packetBytes = new byte[bytesAvailable];
-                            inStream.read(packetBytes);
-                            for(int i = 0 ;i < bytesAvailable; i++)
-                            {
-                                byte b = packetBytes[i];
-                                if(b == delimiter)
-                                {
-                                    byte[] encodedBytes = new byte[readBufferPosition];
-                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
-                                    final String data = new String(encodedBytes, "US-ASCII");
-                                    readBufferPosition = 0;
-                                    handler.post(new Runnable()
-                                    {
-                                        public void run()
-                                        {
-                                            Log.i("SENSOR_DATA", "OUR BT Result - " + data);
-                                            detectData(data);
-                                        }
-                                    });
-                                }
-                                else
-                                {
-                                    readBuffer[readBufferPosition++] = b;
+                        try {
+                            int bytesAvailable = inStream.available();
+                            if (bytesAvailable > 0) {
+                                byte[] packetBytes = new byte[bytesAvailable];
+                                inStream.read(packetBytes);
+                                for (int i = 0; i < bytesAvailable; i++) {
+                                    byte b = packetBytes[i];
+                                    if (b == delimiter) {
+                                        byte[] encodedBytes = new byte[readBufferPosition];
+                                        System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                        final String data = new String(encodedBytes, "US-ASCII");
+                                        readBufferPosition = 0;
+                                        handler.post(new Runnable() {
+                                            public void run() {
+                                                Log.i("SENSOR_DATA", "OUR BT Result - " + data);
+                                                detectData(data);
+                                            }
+                                        });
+                                    } else {
+                                        readBuffer[readBufferPosition++] = b;
+                                    }
                                 }
                             }
+
+                        } catch (IOException ex) {
+                            stopWorker = true;
                         }
-                    }
-                    catch (IOException ex)
-                    {
-                        stopWorker = true;
                     }
                 }
             }
@@ -175,8 +180,11 @@ public class MainActivity extends ActionBarActivity {
         workerThread.start();
     }
 
+    private static int i = 0;
     private void writeData(String data)
     {
+        i++;
+        Log.i(TAG, " i = " + i);
         try
         {
             outStream = BluetoothHandler.getInstance().getOutputStream();
@@ -202,23 +210,26 @@ public class MainActivity extends ActionBarActivity {
     public void detectData(String data)
     {
         String parsedData[] = data.split(":");
-        int sensorName = Integer.parseInt(parsedData[0]);
-        String value = parsedData[1].replace("\r", "");
-        if(value != null || !value.equals(""))
+        if(parsedData.length >= 2)
         {
-            SensorsChair.SENSORS_CODE_LIST  code = SensorsChair.SENSORS_CODE_LIST.values()[sensorName];
-            switch(code)
+            int sensorName = Integer.parseInt(parsedData[0]);
+            String value = parsedData[1].replace("\r", "");
+            if(value != null || !value.equals(""))
             {
-                case UPPER_BACK_SENSOR_NAME:
-                case LOWER_BACK_SENSOR_NAME:
-                case FEET_SENSOR_NAME:
-                case SITTING_BONE_SENSOR_NAME:
-                    SensorsChair.getInstance().updateSensor(code,  value);
-                    updateUIState(code);
-                    break;
-                default:
-                    Log.i(TAG, "Couldn't detect data by sensor " + data);
-                    blueToothMessage.setText(data);
+                SensorsChair.SENSORS_CODE_LIST  code = SensorsChair.SENSORS_CODE_LIST.values()[sensorName];
+                switch(code)
+                {
+                    case UPPER_BACK_SENSOR_NAME:
+                    case LOWER_BACK_SENSOR_NAME:
+                    case FEET_SENSOR_NAME:
+                    case SITTING_BONE_SENSOR_NAME:
+                        SensorsChair.getInstance().updateSensor(code,  value);
+                        updateUIState(code);
+                        break;
+                    default:
+                        Log.i(TAG, "Couldn't detect data by sensor " + data);
+                        blueToothMessage.setText(data);
+                }
             }
         }
     }
@@ -260,6 +271,11 @@ public class MainActivity extends ActionBarActivity {
         if(state == SensorsChair.POSTURE_STATUS.BAD)
         {
             mGeneralPostureState.setImageResource(R.drawable.traffic_light_red);
+            if(badPostureNotificationNumber % 5 == 0)
+            {
+                writeData("a");
+            }
+            badPostureNotificationNumber++;
         }
         else
         {

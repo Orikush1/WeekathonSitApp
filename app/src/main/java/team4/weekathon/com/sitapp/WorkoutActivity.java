@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import team4.weekathon.com.workoutchair.R;
-
 /**
  * Created by Ori on 3/23/2015.
  */
@@ -64,10 +62,10 @@ public class WorkoutActivity extends FragmentActivity
                 });
 
         // Add 3 tabs, specifying the tab's text and TabListener
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             actionBar.addTab(
                     actionBar.newTab()
-                            .setText("Tab " + (i + 1))
+                            .setText("Exercise " + (i + 1))
                             .setTabListener(tabListener));
         }
     }
@@ -79,12 +77,23 @@ public class WorkoutActivity extends FragmentActivity
         }
 
         @Override
-        public Fragment getItem(int i) {
-            Fragment fragment = new DemoObjectFragment();
-            Bundle args = new Bundle();
-            // Our object is just an integer :-P
-            args.putInt(DemoObjectFragment.ARG_OBJECT, i + 1);
-            fragment.setArguments(args);
+        public Fragment getItem(int i)
+        {
+            Fragment fragment;
+
+            if(i == 0)
+            {
+                 fragment = new HandsExercise();
+            }
+            else
+            {
+                fragment = new DemoObjectFragment();
+                Bundle args = new Bundle();
+                // Our object is just an integer :-P
+                args.putInt(DemoObjectFragment.ARG_OBJECT, i + 1);
+                fragment.setArguments(args);
+            }
+
             return fragment;
         }
 
@@ -111,9 +120,9 @@ public class WorkoutActivity extends FragmentActivity
             // properly.
             View rootView = inflater.inflate(
                     R.layout.workout_tab, container, false);
-            Bundle args = getArguments();
+/*            Bundle args = getArguments();
             ((TextView) rootView.findViewById(android.R.id.text1)).setText(
-                    Integer.toString(args.getInt(ARG_OBJECT)));
+                    Integer.toString(args.getInt(ARG_OBJECT)));*/
             return rootView;
         }
     }
