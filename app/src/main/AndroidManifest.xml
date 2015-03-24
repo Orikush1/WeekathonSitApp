@@ -31,6 +31,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Holo.Light">
         </activity>
+        <activity
+            android:name="team4.weekathon.com.sitapp.HistoryActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+        </activity>
     </application>
 
 </manifest>

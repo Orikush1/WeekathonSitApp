@@ -154,12 +154,10 @@ public class HandsExercise extends Fragment {
         public void onClick(View v) {
             if(!avatarIsUp)
             {
-                //Toast.makeText(getApplicationContext(), "Up", Toast.LENGTH_SHORT).show();
                 MoveAvatarUp();
-                //Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_SHORT).show();
-
-            } else {
-                //Toast.makeText(getApplicationContext(), "Down", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
                 MoveAvatarDown();
             }
         }
