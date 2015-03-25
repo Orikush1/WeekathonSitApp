@@ -1,3 +1,4 @@
+/*
 package team4.weekathon.com.sitapp;
 
 import android.app.ActionBar;
@@ -11,9 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+*/
 /**
  * Created by Ori on 3/23/2015.
- */
+ *//*
+
 public class WorkoutActivity extends FragmentActivity
 {
     DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
@@ -65,6 +68,10 @@ public class WorkoutActivity extends FragmentActivity
             {
                  fragment = new HandsExercise();
             }
+            else if(i == 1)
+            {
+                fragment = new StaticExerciseActivity();
+            }
             else
             {
                 fragment = new DemoObjectFragment();
@@ -106,3 +113,4 @@ public class WorkoutActivity extends FragmentActivity
 }
 
 
+*/

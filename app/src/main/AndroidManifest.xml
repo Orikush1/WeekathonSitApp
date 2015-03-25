@@ -27,7 +27,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="team4.weekathon.com.sitapp.WorkoutActivity"
+            android:name="team4.weekathon.com.sitapp.StaticExerciseActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@android:style/Theme.Holo.Light">
+        </activity>
+        <activity
+            android:name="team4.weekathon.com.sitapp.HandsExercise"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Holo.Light">
         </activity>

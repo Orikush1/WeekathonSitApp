@@ -51,7 +51,7 @@ public class SensorsChair
         sensorsList.put(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME.name(),400 , 600));
         sensorsList.put(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME.name(), 400, 600 ));
         sensorsList.put(SENSORS_CODE_LIST.ARM, new Sensor(SENSORS_CODE_LIST.ARM.name(),400 , 600 ));
-        sensorsList.put(SENSORS_CODE_LIST.HAND_POWER, new Sensor(SENSORS_CODE_LIST.HAND_POWER.name(),400, 600 ));
+        sensorsList.put(SENSORS_CODE_LIST.HAND_POWER, new HandPowerSensor(SENSORS_CODE_LIST.HAND_POWER.name(),0, 0 ));
         sensorsList.put(SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME, new FlexSensor(SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME.name(), 444, 447));
 
         mPostureStatus = POSTURE_STATUS.OK;

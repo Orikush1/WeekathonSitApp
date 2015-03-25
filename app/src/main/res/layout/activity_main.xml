@@ -82,21 +82,20 @@
         android:layout_marginLeft="150dp"
         android:layout_below="@+id/upper_back"/>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <Button
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/blue_text"
-        android:layout_alignParentBottom="true"/>
+        android:text="Wanna play?"
+        android:id="@+id/workout_button"
+        android:background="#ff2c42ff"
+        android:layout_above="@+id/static_work" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Workout!"
-        android:id="@+id/workout_button"
-        android:layout_above="@+id/blue_text"
-        android:layout_alignRight="@+id/posture"
-        android:layout_alignEnd="@+id/posture"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:background="#ff2c42ff" />
+        android:text="Let's do Sport!"
+        android:id="@+id/static_work"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentBottom="true"
+        android:background="#ff99ff59" />
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package team4.weekathon.com.sitapp;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -16,12 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.observables.AndroidObservable;
 
 /**
  * Created by Ori on 3/24/2015.
  */
-public class HandsExercise extends Fragment {
+public class HandsExercise extends Activity {
 
     private ImageView imageView;
     private TextView scoreText;
@@ -39,20 +41,21 @@ public class HandsExercise extends Fragment {
     private Handler warningHandler;
     private boolean IsCrabInZone;
     private Toast goUpToast;
+    private Subscription updateSubscription;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        // The last two arguments ensure LayoutParams are inflated
-        // properly.
-        View rootView = inflater.inflate(R.layout.hands_exercise, container, false);
-        imageView = (ImageView) rootView.findViewById(R.id.android);
-        scoreText = (TextView)rootView.findViewById(R.id.hello);
-        RelativeLayout mainLayout = (RelativeLayout) rootView.findViewById(R.id.game1);
+
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.hands_exercise);
+
+        imageView = (ImageView) findViewById(R.id.android);
+        scoreText = (TextView)findViewById(R.id.hello);
+        RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.game1);
 
         scoreText.setOnClickListener(myListener);
 
-        ballImage = new ImageView(getActivity());
+        ballImage = new ImageView(this);
         //setting image resource
         ballImage.setImageResource(R.drawable.crab);
         //ballImage.setId(R.id.ball);
@@ -76,9 +79,9 @@ public class HandsExercise extends Fragment {
         startIteration();
 
 
-        rx.Observable<SensorsChair.SENSORS_CODE_LIST> updateSensorUI = SensorsChair.getInstance().getUpdateNotifier();
-        updateSensorUI =  AndroidObservable.bindFragment(this, updateSensorUI);
-        updateSensorUI.subscribe(new Subscriber<SensorsChair.SENSORS_CODE_LIST>() {
+        rx.Observable<SensorsChair.SENSORS_CODE_LIST> updateObs = SensorsChair.getInstance().getUpdateNotifier();
+        updateObs =  AndroidObservable.bindActivity(this, updateObs);
+        updateSubscription = updateObs.subscribe(new Subscriber<SensorsChair.SENSORS_CODE_LIST>() {
             @Override
             public void onCompleted() {
 
@@ -90,12 +93,10 @@ public class HandsExercise extends Fragment {
             }
 
             @Override
-            public void onNext(SensorsChair.SENSORS_CODE_LIST sensorCode)
-            {
+            public void onNext(SensorsChair.SENSORS_CODE_LIST sensorCode) {
                 updateSensorUI(sensorCode);
             }
         });
-        return rootView;
     }
 
     private void updateSensorUI(SensorsChair.SENSORS_CODE_LIST sensorCode)
@@ -228,7 +229,7 @@ public class HandsExercise extends Fragment {
                     public void run() {
                         if(!avatarIsUp)
                         {
-                            goUpToast = Toast.makeText(getActivity(), "Be careful !", Toast.LENGTH_SHORT);
+                            goUpToast = Toast.makeText(HandsExercise.this, "Be careful !", Toast.LENGTH_SHORT);
                             goUpToast.setGravity(Gravity.BOTTOM, 200, 200);
                             goUpToast.show();
                         }

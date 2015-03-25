@@ -27,14 +27,13 @@ public class MainActivity extends ActionBarActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private int badPostureNotificationNumber;
 
-    private TextView blueToothMessage;
-
     private View mUpperBack;
     private View mLowerBack;
     private View mSittingBone;
     private View mArm;
     private ImageView mGeneralPostureState;
     private Button mWorkoutExercise;
+    private Button mStaticWorkoutExercise;
 
     private byte[] readBuffer = new byte[1024];
     private static final byte delimiter =  (byte) '\n';
@@ -50,16 +49,24 @@ public class MainActivity extends ActionBarActivity {
         mLowerBack = findViewById(R.id.lower_back);
         mSittingBone = findViewById(R.id.sitting_bone);
         mArm = findViewById(R.id.arm);
-        blueToothMessage = (TextView)findViewById(R.id.blue_text);
         mGeneralPostureState = (ImageView) findViewById(R.id.traffic_light);
         mWorkoutExercise = (Button) findViewById(R.id.workout_button);
+        mStaticWorkoutExercise = (Button) findViewById(R.id.static_work);
         BluetoothHandler.getInstance().initContext(getApplicationContext());
         boolean isConnected = BluetoothHandler.getInstance().CheckBluetoothConnection();
 
         mWorkoutExercise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, WorkoutActivity.class);
+                Intent intent = new Intent(MainActivity.this, HandsExercise.class);
+                startActivity(intent);
+            }
+        });
+
+        mStaticWorkoutExercise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StaticExerciseActivity.class);
                 startActivity(intent);
             }
         });
@@ -162,7 +169,6 @@ public class MainActivity extends ActionBarActivity {
                     break;
                 default:
                     Log.i(TAG, "Couldn't detect data by sensor ");
-                    blueToothMessage.setText("Something found");
             }
 
             updateGeneralPostureState();
