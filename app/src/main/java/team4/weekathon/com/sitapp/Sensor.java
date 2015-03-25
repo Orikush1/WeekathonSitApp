@@ -5,10 +5,10 @@ package team4.weekathon.com.sitapp;
  */
 public class Sensor
 {
-    private final int thresholdMin;
-    private final int thresholdMax;
-    private String sensorDesc;
-    private boolean state;
+    protected final int thresholdMin;
+    protected final int thresholdMax;
+    protected String sensorDesc;
+    protected boolean state;
 
     public Sensor(String sensorDesc, int thresholdMin, int thresholdMax)
     {
