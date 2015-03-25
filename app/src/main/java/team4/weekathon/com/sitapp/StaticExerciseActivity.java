@@ -2,6 +2,7 @@ package team4.weekathon.com.sitapp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,14 +61,7 @@ public class StaticExerciseActivity extends Activity{
             @Override
             public void onNext(SensorsChair.SENSORS_CODE_LIST sensorCode)
             {
-                if(firstTimeOfUse)
-                {
-                    firstTimeOfUse = false;
-                }
-                else
-                {
-                    updateSensorUI(sensorCode);
-                }
+                updateSensorUI(sensorCode);
             }
         });
 
@@ -84,16 +78,20 @@ public class StaticExerciseActivity extends Activity{
         }
     }
 
-
     private void MoveArrow2(int value)
     {
-        if (value < 320)
+       /* if (value < 340)
             value=320;
         if (value > 355)
             value=355;
         float a = -1000/(355-320);
         float b = -320*a;
-        MoveArrow((int)(a*value+b));
+        MoveArrow((int)(a*value+b));*/
+
+        if(value > 355)
+        {
+            MoveArrow(arrowViewPosition-100);
+        }
     }
 
     private void MoveArrow(int NewPosition)
@@ -105,7 +103,7 @@ public class StaticExerciseActivity extends Activity{
         anim.setDuration(10);
         anim.setFillAfter(true);
         arrowView.startAnimation(anim);
-        if(NewPosition < -990)
+        if(NewPosition < -900)
         {
             popBalloon();
         }
@@ -115,7 +113,16 @@ public class StaticExerciseActivity extends Activity{
     private void popBalloon()
     {
        balloonView.setImageResource(R.drawable.pop);
+       MoveArrow(0);
 
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run()
+            {
+                balloonView.setImageResource(R.drawable.balloon);
+            }
+        }, 200);
     }
 
     private  View.OnClickListener myListener =  new View.OnClickListener() {

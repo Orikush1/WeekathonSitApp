@@ -6,7 +6,7 @@ package team4.weekathon.com.sitapp;
 public class HandPowerSensor extends Sensor {
 
     private int previousValue;
-    private boolean firstTimeOfUse = true;
+
     public HandPowerSensor(String sensorDesc, int thresholdMin, int thresholdMax) {
         super(sensorDesc, thresholdMin, thresholdMax);
     }
