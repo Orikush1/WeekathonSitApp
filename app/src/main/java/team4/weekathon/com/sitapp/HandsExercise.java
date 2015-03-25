@@ -100,34 +100,15 @@ public class HandsExercise extends Fragment {
 
     private void updateSensorUI(SensorsChair.SENSORS_CODE_LIST sensorCode)
     {
-        /*Sensor currentSensor = SensorsChair.getInstance().getSensor(sensorCode);
-        switch(sensorCode)
-        {
-            case SITTING_BONE_SENSOR_NAME:
-            case ARM:
-            case HAND_POWER:
-            case LOWER_BACK_SENSOR_NAME:
-            case UPPER_BACK_SENSOR_NAME:
-                if(currentSensor.isSitting() && avatarIsUp)
-                {
-                    MoveAvatarDown();
-                }
-                else if(!currentSensor.isSitting() && !avatarIsUp)
-                {
-                    MoveAvatarUp();
-                }
-                break;
-        }*/
-
         if(sensorCode == SensorsChair.SENSORS_CODE_LIST.ARM || sensorCode == SensorsChair.SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME)
         {
             Sensor armSensor = SensorsChair.getInstance().getSensor(SensorsChair.SENSORS_CODE_LIST.ARM);
             Sensor sittingSensor = SensorsChair.getInstance().getSensor(SensorsChair.SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME);
-            if(armSensor.isSitting() && sittingSensor.isSitting() && avatarIsUp)
+            if(armSensor.isSitting() && sittingSensor.isSitting())
             {
                 MoveAvatarDown();
             }
-            else if(armSensor.isSitting() && !sittingSensor.isSitting()  && !avatarIsUp)
+            else if(armSensor.isSitting() && !sittingSensor.isSitting())
             {
                 MoveAvatarUp();
             }
