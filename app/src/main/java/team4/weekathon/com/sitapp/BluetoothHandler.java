@@ -178,7 +178,8 @@ public class BluetoothHandler
                 {
                     case UPPER_BACK_SENSOR_NAME:
                     case LOWER_BACK_SENSOR_NAME:
-                    case FEET_SENSOR_NAME:
+                    case HAND_POWER:
+                    case ARM:
                     case SITTING_BONE_SENSOR_NAME:
                         SensorsChair.getInstance().updateSensor(code,  value);
                         break;

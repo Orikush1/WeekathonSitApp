@@ -34,6 +34,11 @@ public class HandsExercise extends Fragment {
     private int speedLevel = 8;
     private int game1score=0;
     private boolean situpIsGood = true;
+    private Handler crabEnterZoneHandler;
+    private Handler crabExitZoneHandler;
+    private Handler warningHandler;
+    private boolean IsCrabInZone;
+    private Toast goUpToast;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -46,7 +51,6 @@ public class HandsExercise extends Fragment {
         RelativeLayout mainLayout = (RelativeLayout) rootView.findViewById(R.id.game1);
 
         scoreText.setOnClickListener(myListener);
-
 
         ballImage = new ImageView(getActivity());
         //setting image resource
@@ -68,8 +72,9 @@ public class HandsExercise extends Fragment {
         //ballImage.setLayoutParams(new LinearLayout.LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
         mainLayout.addView(ballImage);
 
-        initGame1();
-        doGame1();
+        scoreText.setText("SitUpsLeft=" + currentBallNum);
+        startIteration();
+
 
         rx.Observable<SensorsChair.SENSORS_CODE_LIST> updateSensorUI = SensorsChair.getInstance().getUpdateNotifier();
         updateSensorUI =  AndroidObservable.bindFragment(this, updateSensorUI);
@@ -100,8 +105,8 @@ public class HandsExercise extends Fragment {
         {
             case SITTING_BONE_SENSOR_NAME:
             case ARM:
-            case FEET_SENSOR_NAME:
-            case  LOWER_BACK_SENSOR_NAME:
+            case HAND_POWER:
+            case LOWER_BACK_SENSOR_NAME:
             case UPPER_BACK_SENSOR_NAME:
                 if(currentSensor.isSitting() && avatarIsUp)
                 {
@@ -116,7 +121,8 @@ public class HandsExercise extends Fragment {
     }
 
 
-    private void MoveAvatarUp() {
+    private void MoveAvatarUp()
+    {
         if (!avatarIsUp) {
             TranslateAnimation moveUp = new TranslateAnimation(0, 0, 0, -200);
             moveUp.setDuration(1000);
@@ -128,23 +134,35 @@ public class HandsExercise extends Fragment {
     }
 
     private void MoveAvatarDown() {
-        if (avatarIsUp) {
+        if (avatarIsUp)
+        {
             TranslateAnimation moveDown = new TranslateAnimation(0, 0, -200, 0);
             moveDown.setDuration(1000);
             moveDown.setFillAfter(true);
             imageView.startAnimation(moveDown);
         }
 
-        if(game1state==4 && situpIsGood)
+        if(IsCrabInZone && situpIsGood)
         {
-            situpIsGood = false;
-            imageView.setImageResource(R.drawable.androidr);
+            Fail();
         }
-        else
-        {
-            imageView.setImageResource(R.drawable.android);
-        }
+
         avatarIsUp = false;
+    }
+
+
+    private void Fail()
+    {
+        //cancel handlers
+        crabEnterZoneHandler.removeCallbacks(null);
+        warningHandler.removeCallbacks(null);
+        crabExitZoneHandler.removeCallbacks(null);
+
+        //cancel animation and red android
+        imageView.setImageResource(R.drawable.androidr);
+        ballImage.clearAnimation();
+        situpIsGood = false;
+
     }
 
 
@@ -163,109 +181,108 @@ public class HandsExercise extends Fragment {
         }
     };
 
-    private void initGame1() {
-        //currentBallNum = numBalls;
-        game1state=0;
-        scoreText.setText("SitUpsLeft=" + currentBallNum);
+    private void crabEnterZone()
+    {
+        IsCrabInZone = true;
+
+        if(!avatarIsUp)
+        {
+            Fail();
+        }
+
     }
 
-    private void doGame1() {
+    private void crabExitZone()
+    {
+        IsCrabInZone = false;
+    }
 
-        final long duration1 = 50000/speedLevel;
-        if (game1state==0 && currentBallNum>=0) {
-            game1state = 1;
-            TranslateAnimation moveLeft1 = new TranslateAnimation(0, -400, 0, 0);
-            moveLeft1.setDuration(duration1);
-            moveLeft1.setFillAfter(true);
+    private void startIteration() {
+        //Position crab
+        //Start animation of crab
+        //set timer to call crab enter red zone
+        //
+        final long duration1 = 50000 / speedLevel;
+        if(avatarIsUp)
+        {
+            imageView.setImageResource(R.drawable.handsup);
+        }
+        else
+        {
+            imageView.setImageResource(R.drawable.android);
+        }
+        situpIsGood = true;
+        IsCrabInZone = false;
 
-            moveLeft1.setAnimationListener(new Animation.AnimationListener() {
-                public void onAnimationStart(Animation a) {
-                    //Log.v("anim","---- animation start listener called"  );
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                           Toast goUpToast =  Toast.makeText(getActivity(), "Be careful !", Toast.LENGTH_SHORT);
+        if (currentBallNum <= 0)
+        {
+            scoreText.setText("Good Job!");
+            return;
+        }
+
+        TranslateAnimation moveLeft1 = new TranslateAnimation(0, -1000, 0, 0);
+        moveLeft1.setDuration(duration1);
+        moveLeft1.setFillAfter(true);
+
+        moveLeft1.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationStart(Animation a) {
+                //Log.v("anim","---- animation start listener called"  );
+                warningHandler = new Handler();
+                warningHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(!avatarIsUp)
+                        {
+                            goUpToast = Toast.makeText(getActivity(), "Be careful !", Toast.LENGTH_SHORT);
                             goUpToast.setGravity(Gravity.BOTTOM, 200, 200);
                             goUpToast.show();
                         }
-                    }, (long)(duration1 * 0.8));
-                }
-
-                public void onAnimationRepeat(Animation a) {
-                    //Log.v("anim","---- animation repeat listener called"  );
-                }
-
-                public void onAnimationEnd(Animation a) {
-                    //Log.v("anim", "---- animation end listener called");
-                    game1state=2;
-                    doGame1();
-                }
-            });
-            ballImage.startAnimation(moveLeft1);
-            return;
-        }
-        if (game1state==2) {
-            game1state = 3;
-            //imageView.setImageResource(R.drawable.handsup);
-            TranslateAnimation moveLeft1 = new TranslateAnimation(-400, -800, 0, 0);
-            moveLeft1.setDuration(50000/speedLevel);
-            moveLeft1.setFillAfter(true);
-
-            moveLeft1.setAnimationListener(new Animation.AnimationListener() {
-                public void onAnimationStart(Animation a) {
-                    //Log.v("anim","---- animation start listener called"  );
-                    game1state = 4;
-                    if (!avatarIsUp) {
-                        situpIsGood = false;
-                        imageView.setImageResource(R.drawable.androidr);
-
-                        ballImage.clearAnimation();
-                        /*
-
-                        */
                     }
-                }
+                }, (long)(duration1 * 0.3));
 
-                public void onAnimationRepeat(Animation a) {
-                }
-
-                public void onAnimationEnd(Animation a) {
-                    //Log.v("anim", "---- animation end listener called");
-                    if (!situpIsGood) {
-                        //imageView.setImageResource(R.drawable.android);
-                        final Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                imageView.setImageResource(R.drawable.android);
-                                game1state=0;
-                                situpIsGood=true;
-                                doGame1();
-                            }
-                        }, 300);
-                        return;
+                crabEnterZoneHandler = new Handler();
+                crabEnterZoneHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        crabEnterZone();
                     }
-                    game1state=5;
-                    doGame1();
-                }
-            });
-            ballImage.startAnimation(moveLeft1);
-            return;
-        }
+                }, (long)(duration1 * 0.47));
 
-        if (game1state==5) {
-            if (situpIsGood)
-                currentBallNum--;
-            if (currentBallNum>=0) {
-                //initGame1();
-                game1state=0;
-                situpIsGood=true;
-                scoreText.setText("SitUpsLeft=" + currentBallNum);
-                doGame1();
-            } else {
-                scoreText.setText("Good Job!");
+                crabExitZoneHandler = new Handler();
+                crabExitZoneHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        crabExitZone();
+                    }
+                }, (long) (duration1 * 0.65));
+
             }
-        }
+
+            public void onAnimationRepeat(Animation a) {
+                //Log.v("anim","---- animation repeat listener called"  );
+            }
+
+            public void onAnimationEnd(Animation a)
+            {
+                if (situpIsGood)
+                {
+                    currentBallNum--;
+                    scoreText.setText("SitUpsLeft =" + currentBallNum);
+                }
+
+
+                Handler animationEnd = new Handler();
+                animationEnd.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startIteration();
+                    }
+                }, 300);
+            }
+
+        });
+        ballImage.startAnimation(moveLeft1);
     }
 }

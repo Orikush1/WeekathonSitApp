@@ -103,10 +103,6 @@ public class WorkoutActivity extends FragmentActivity
             return rootView;
         }
     }
-
-
-
-
 }
 
 

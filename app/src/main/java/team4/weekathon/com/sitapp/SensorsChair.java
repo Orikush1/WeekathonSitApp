@@ -25,11 +25,11 @@ public class SensorsChair
     public enum SENSORS_CODE_LIST
     {
         DUMMY_SENSOR,
-        LOWER_BACK_SENSOR_NAME,
         UPPER_BACK_SENSOR_NAME,
-        SITTING_BONE_SENSOR_NAME,
-        FEET_SENSOR_NAME,
+        LOWER_BACK_SENSOR_NAME,
+        HAND_POWER,
         ARM,
+        SITTING_BONE_SENSOR_NAME,
         MAX,
 
     }
@@ -51,8 +51,8 @@ public class SensorsChair
         sensorsList.put(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.LOWER_BACK_SENSOR_NAME.name(),400 , 600));
         sensorsList.put(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.UPPER_BACK_SENSOR_NAME.name(), 400, 600 ));
         sensorsList.put(SENSORS_CODE_LIST.ARM, new Sensor(SENSORS_CODE_LIST.ARM.name(),400 , 600 ));
-        sensorsList.put(SENSORS_CODE_LIST.FEET_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.FEET_SENSOR_NAME.name(),400, 600 ));
-        sensorsList.put(SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.FEET_SENSOR_NAME.name(), 400, 600));
+        sensorsList.put(SENSORS_CODE_LIST.HAND_POWER, new Sensor(SENSORS_CODE_LIST.HAND_POWER.name(),400, 600 ));
+        sensorsList.put(SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME, new Sensor(SENSORS_CODE_LIST.SITTING_BONE_SENSOR_NAME.name(), 400, 600));
 
         mPostureStatus = POSTURE_STATUS.OK;
         numberOfBadState = 0;
